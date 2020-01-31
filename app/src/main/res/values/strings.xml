@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">photogallery2</string>
+    <string name="edit_caption">Enter a captioin</string>
+    <string name="edit_startingtime">From</string>
+    <string name="edit_endingtime">To</string>
+    <string name="edit_startinglatitude">From</string>
+    <string name="edit_endinglatitude">To</string>
+    <string name="edit_startinglongitude">From</string>
+    <string name="edit_endinglongitude">To</string>
+    <string name="button_searchcaption">Search</string>
+    <string name="button_searchtime">Search</string>
+    <string name="button_searchlocation">Search</string>
+    <string name="text_caption">Caption Searching</string>
+    <string name="text_time">Time Searching</string>
+    <string name="text_longitude">Longitude</string>
+    <string name="text_location">Location Searching</string>
+    <string name="text_latitude">Latitude</string>
+    <string name="button_search">Search</string>
+</resources>
