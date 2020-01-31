@@ -1,3 +1,11 @@
+//To get a picture with the GPS info in the Exif Tags, do the following:
+//- enable Location permissions for phone
+//- enable Location permissions for camera app
+//- in the camera app, go to Settings and enable Save Location
+//- either go outside and wait until you get a GPS signal, or connect to wifi
+//- take a picture using this app
+//If a picture does not have the GPS info in the Exif Tags, "no location info" is displayed
+
 package com.example.photogallery2;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
