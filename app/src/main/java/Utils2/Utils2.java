@@ -1,9 +1,7 @@
-//Utility classes for Photo Gallery app
-package Util;
-
+//Utility class for Photo Gallery app
+package Utils2;
 import android.content.Context;
 import android.os.Environment;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,13 +11,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Util
+public class Utils2
 {
     //This function gets the filename of a file containing the given text in the appropriate directory of this app.
     //If the string is "captions", the file is in the Documents directory of this app.
     //If the string if "dates", the file is in the Music directory of this app.
     //If the file does not exist, it creates one.
-    //As for why Context c is required, see //https://stackoverflow.com/questions/34638931/android-says-cannot-resolve-method-getexternalfilesdirnull
+    //As for why Context c is required, see https://stackoverflow.com/questions/34638931/android-says-cannot-resolve-method-getexternalfilesdirnull
     public File GetFile(Context c, String s)
     {
         File f = null;
@@ -28,7 +26,7 @@ public class Util
         else if(s.contains("dates"))
             f = c.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
         else
-            {/*invalid string was passed*/}
+        {/*invalid string was passed*/}
         File[] fl;
         if(f != null)
         {
@@ -82,7 +80,7 @@ public class Util
     }
     //============================================================================================================================
 
-    //This function saves the given list to the specified file.
+    //This function saves the given list to the file specified by s ("captions" or "dates").
     public void SaveToFile(Context c, List list, String s)
     {
         //Need to delete the file and rewrite the list to file.

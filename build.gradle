@@ -4,11 +4,11 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
+        mavenCentral() //added to copy https://www.petrikainulainen.net/programming/testing/junit-5-tutorial-running-unit-tests-with-gradle/
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
-        
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -25,3 +25,4 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+

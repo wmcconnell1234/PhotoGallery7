@@ -21,11 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -38,33 +34,34 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 ////////////////////// IL
-import Util.*; //Utility class containing helpful functions for Photo Gallery app
+import Utils2.*; //Utility class containing helpful functions for Photo Gallery app
+import SearchUtil.*; //Utility class containing search function for Photo Gallery app
 
 public class MainActivity extends AppCompatActivity
 {
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 0;
-    static final int BLANK_SCREEN = -1; //used with Go() function to tell it to go to a blank screen
+    private static final int BLANK_SCREEN = -1; //used with Go() function to tell it to go to a blank screen
     /////////////////////////////////////IL
-    String returnStartTime;     // 2 global variables that stores the time from 2nd activity
-    String returnEndTime;
+    private String returnStartTime;     // 2 global variables that stores the time from 2nd activity
+    private String returnEndTime;
     /////////////////////////////////////IL
-    String mCurrentPhotoPath;
-    String currentFileName = null; //only used to save the filename of the new picture to add to file name list
-    Date CurrentDate = null;       //only used to save the date of the new picture to add to date list
+    private String mCurrentPhotoPath;
+    private String currentFileName = null; //only used to save the filename of the new picture to add to file name list
+    private Date CurrentDate = null;       //only used to save the date of the new picture to add to date list
     //Master lists. These are used to keep track of all files, captions, and dates.
-    List captionListM = new ArrayList();
-    List filenameListM = new ArrayList();
-    List dateListM = new ArrayList<Date>();
+    private List captionListM = new ArrayList();
+    private List filenameListM = new ArrayList();
+    private List dateListM = new ArrayList<Date>();
     //Filtered lists. These are used to keep track of which content is to be displayed.
-    List captionListF = new ArrayList();
-    List filenameListF = new ArrayList();
-    List dateListF = new ArrayList<Date>();
+    private List captionListF = new ArrayList();
+    private List filenameListF = new ArrayList();
+    private List dateListF = new ArrayList<Date>();
     //The element number of the current image. Refers to the element number in the FILTERED list.
-    int currentElement = 0;
-    //Instantiate the utility class that provides helpful functions for this app
-    private Util U = new Util();
-
+    private int currentElement = 0;
+    //Instantiate the utility classes that provide helpful functions for this app
+    private Utils2 U = new Utils2();
+    private SearchUtil S = new SearchUtil();
     //============================================================================================================================
 
     private void displayPhoto(String path) {
@@ -187,56 +184,20 @@ public class MainActivity extends AppCompatActivity
             String get_caption = data.getStringExtra("CAPTION");
             returnStartTime = data.getStringExtra("STARTDATE");
             returnEndTime = data.getStringExtra("ENDDATE");
-            //Initialize date formats
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-            SimpleDateFormat sdfUser = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            ParsePosition parsepos = new ParsePosition(0);
-            //Set up the search criteria for date
-            Date dStartTime;
-            Date dEndTime;
-            //if one or both dates were left empty, set the search criteria for date so that all image dates are accepted
-            if (returnStartTime.isEmpty() || returnEndTime.isEmpty())
-            {
-                String minDate = "00010101_000000";
-                String maxDate = "20500505_000000";
-                Date minDateD = sdfUser.parse(minDate,parsepos);
-                parsepos.setIndex(0);
-                Date maxDateD = sdfUser.parse(maxDate,parsepos);
-                parsepos.setIndex(0);
-                dStartTime = minDateD;
-                dEndTime = maxDateD;
-            }
-            //Else, set the search criteria for date to the user-entered values
-            ////////////////////////////////////////////////////////////////////////
-            ////////     the user input the date in a simple format that can't be compared with the format of the list
-            ////          so we get the "simple format" string,
-            else {
-                dStartTime = sdfUser.parse(returnStartTime, parsepos);
-                parsepos.setIndex(0);
-                dEndTime = sdfUser.parse(returnEndTime, parsepos);
-                parsepos.setIndex(0);
-            }
-            //Clear filtered lists in preparation for regenerating them
+            String lat1 = null;
+            String lng1 = null; //these will hold the user-entered latitude and longitude
+            String lat2 = null; String lng2 = null; //depending on the search logic these two might not be needed
+            //Clear filtered lists in preparation for receiving the results from Search()
             filenameListF.clear();
             captionListF.clear();
             dateListF.clear();
-            //Loop through all files, add the ones that match the search criteria to the filtered lists
-            int cap_index = 0;
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"/Android/data/com.example.photogallery2/files/Pictures");
-            for (File fwm : file.listFiles()) {
-                String str = captionListM.get(cap_index).toString();
-                if (str.contains(get_caption)) {       ////////////////   comparsion
-                    Date d1 = new Date();
-                    d1 = sdf.parse(dateListM.get(cap_index).toString(), parsepos);
-                    parsepos.setIndex(0);
-                    if (d1.compareTo(dStartTime) > 0 && d1.compareTo(dEndTime) < 0) {
-                        filenameListF.add(fwm.getName());
-                        captionListF.add(captionListM.get(cap_index).toString());
-                        dateListF.add(dateListM.get(cap_index).toString());
-                    }
-                }
-                cap_index++;
-            }//end for
+            //Search!!
+            List result = new ArrayList();
+            result = S.Search(MainActivity.this,get_caption,returnStartTime,returnEndTime,lat1,lng1,lat2,lng2,captionListM,dateListM);
+            //Unpack result
+            filenameListF = (List) result.get(0);
+            captionListF = (List) result.get(1);
+            dateListF = (List) result.get(2);
             //If the search is cleared, re-enable the snap button
             Button button = findViewById(R.id.btnSnap);
             if(get_caption.isEmpty())
@@ -309,7 +270,7 @@ public class MainActivity extends AppCompatActivity
     //============================================================================================================================
 
     //Goes to the specified element in the filtered list. -1 means go to blank screen.
-    private void Go(int element)
+    public void Go(int element)
     {
         if(element != BLANK_SCREEN)
         {
